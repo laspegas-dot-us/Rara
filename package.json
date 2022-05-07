@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/laspegas-dot-us/Rara#readme",
   "dependencies": {
+    "@discordjs/rest": "^0.4.1",
+    "discord-api-types": "^0.32.1",
     "discord.js": "^13.6.0"
   }
 }
