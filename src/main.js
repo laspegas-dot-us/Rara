@@ -3,8 +3,10 @@ const { exit } = require("process");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const { Intents, Client } = require("discord.js");
+const { ReactionRole } = require("discordjs-reaction-role");
 const commands = require("./commands/commands");
 const refreshActivity = require("./activity");
+const ReactionAssociations = require("./roles");
 
 const GlobalCommands = [
     {
@@ -23,6 +25,8 @@ async function main() {
     const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
     const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
 
+    const REACTION_LISTEN_MESSAGE_ID = process.env.REACTION_LISTEN_MESSAGE_ID;
+
     if (!DISCORD_CLIENT_ID || !DISCORD_TOKEN) {
         console.error("Nie wskazano tokenu logowania lub identyfikatora klienta (zmienne środowiskowe DISCORD_CLIENT_ID, DISCORD_TOKEN).");
         exit(1);
@@ -30,6 +34,10 @@ async function main() {
 
     if (!DISCORD_GUILD_ID) {
         console.warn("Nie wskazano identyfikatora serwera Discord (zmienna środowiskowa DISCORD_GUILD_ID) - polecenia z nim powiązane mogą być niedostępne.");
+    }
+
+    if (!REACTION_LISTEN_MESSAGE_ID) {
+        console.warn("Nie wskazano identyfikatora wiadomości (zmienna środowiskowa REACTION_LISTEN_MESSAGE_ID), której reakcje powinny być monitorowane - zmiana ról nie będzie automatyzowana.");
     }
 
     console.log("Inicjalizacja obiektów i logowanie do Discord...");
@@ -44,7 +52,24 @@ async function main() {
         exit(1);
     }
 
-    const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+    const client = new Client({
+        partials: ["MESSAGE", "REACTION"],
+        intents: [Intents.FLAGS.GUILDS | Intents.FLAGS.GUILD_MESSAGES | Intents.FLAGS.GUILD_MESSAGE_REACTIONS]
+    });
+
+    var ReactionManager = null;
+    if (REACTION_LISTEN_MESSAGE_ID) {
+        ReactionManager = new ReactionRole(client, ReactionAssociations);
+        console.log("Zainicjowano ReactionManager.");
+    }
+
+    const destroy = () => {
+        if (ReactionManager !== null) {
+            ReactionManager.teardown();
+        }
+        client.destroy();
+        exit(0);
+    }
 
     client.on("ready", () => {
         console.log(`Zalogowano do Discord jako ${client.user.tag}.`);
@@ -64,6 +89,9 @@ async function main() {
         }
 
     });
+
+    process.on("SIGINT", destroy);
+    process.on("SIGTERM", destroy);
 
     console.log("Zarejestrowano eventy.");
     client.login(DISCORD_TOKEN);
