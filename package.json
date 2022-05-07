@@ -1,0 +1,25 @@
+{
+  "name": "rara",
+  "version": "1.0.0",
+  "description": "Twoja ulubiona wirtualna asystentka",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laspegas-dot-us/Rara.git"
+  },
+  "keywords": [
+    "discord"
+  ],
+  "author": "LPFM Developers",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/laspegas-dot-us/Rara/issues"
+  },
+  "homepage": "https://github.com/laspegas-dot-us/Rara#readme",
+  "dependencies": {
+    "discord.js": "^13.6.0"
+  }
+}
