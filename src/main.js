@@ -4,11 +4,12 @@ const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const { Intents, Client } = require("discord.js");
 const commands = require("./commands/commands");
+const refreshActivity = require("./activity");
 
 const GlobalCommands = [
     {
         name: "about",
-        description: "Wyświetl informacje o bocie i jego autorach."
+        description: "Wyświetl informacje o aplikacji i jej autorach."
     }
 ];
 
@@ -36,7 +37,7 @@ async function main() {
 
     try {
         await Rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: GlobalCommands });
-        await Rest.put(Routes.applicationGuildCommands(DISCORD_CLIENT_ID, DISCORD_GUILD_ID), { body: LPFMOnlyCommands });
+        //await Rest.put(Routes.applicationGuildCommands(DISCORD_CLIENT_ID, DISCORD_GUILD_ID), { body: LPFMOnlyCommands });
         console.log("Wysłano tablicę poleceń.");
     } catch (error) {
         console.error("Błąd rejestracji poleceń w Discord REST API:" + EOL + error);
@@ -47,6 +48,7 @@ async function main() {
 
     client.on("ready", () => {
         console.log(`Zalogowano do Discord jako ${client.user.tag}.`);
+        refreshActivity(client.user);
     });
 
     client.on("interactionCreate", async interaction => {

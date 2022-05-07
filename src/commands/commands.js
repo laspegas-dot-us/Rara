@@ -1,5 +1,5 @@
 const about = require("./about");
 
-export default {
+module.exports = {
     about
 };
